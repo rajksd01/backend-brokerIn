@@ -1,0 +1,7 @@
+# Flat Brokerage Application Setup Guide
+
+## Required Node Version
+- Node.js >= 14.x
+- npm >= 6.x
+
+## Project Initialization
