@@ -15,8 +15,10 @@ const options = {
     },
     servers: [
       {
-        url: '/',
-        description: 'Current Environment'
+        url: process.env.NODE_ENV === 'production' 
+          ? process.env.API_URL || '' 
+          : 'http://localhost:3030',
+        description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
       }
     ],
     components: {
@@ -50,18 +52,20 @@ const options = {
       bearerAuth: []
     }],
     tags: [
-      { name: 'Auth', description: 'Authentication endpoints' },
+      { name: 'Authentication', description: 'Authentication endpoints' },
       { name: 'Admin', description: 'Admin management endpoints' },
-      { name: 'Properties', description: 'Property management endpoints' },
       { name: 'Services', description: 'Service management endpoints' }
     ]
   },
-  apis: [
-    path.join(__dirname, '../routes/*.ts'),
-    path.join(__dirname, '../routes/*.js'),
-    path.join(__dirname, '../controllers/*.ts'),
-    path.join(__dirname, '../controllers/*.js')
-  ]
+  apis: process.env.NODE_ENV === 'production'
+    ? [
+        path.join(__dirname, './routes/*.js'),
+        path.join(__dirname, './controllers/*.js')
+      ]
+    : [
+        path.join(__dirname, '../routes/*.ts'),
+        path.join(__dirname, '../controllers/*.ts')
+      ]
 };
 
 export const specs = swaggerJsdoc(options);

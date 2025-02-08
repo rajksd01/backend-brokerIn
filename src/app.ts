@@ -54,10 +54,16 @@ app.get('/', (_req, res) => {
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Swagger Documentation with custom options
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(specs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "BrokerIn API Documentation"
+  customSiteTitle: "BrokerIn API Documentation",
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true
+  }
 }));
 
 // Logging middleware
