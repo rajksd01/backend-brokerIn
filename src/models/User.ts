@@ -11,10 +11,7 @@ const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   profilePicture: { type: String, default: 'default-profile.png' },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
-  isVerified: { type: Boolean, default: false },
-  verificationToken: { type: String, default: null },
-  resetPasswordToken: { type: String, default: null },
-  resetPasswordExpires: { type: Date, default: null },
+  isVerified: { type: Boolean, default: true },
   refreshToken: { type: String, default: null }
 }, {
   timestamps: true
@@ -32,4 +29,4 @@ UserSchema.methods.comparePassword = async function(candidatePassword: string): 
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.model<IUser>('User', UserSchema); 
+export default mongoose.model<IUser>('User', UserSchema);

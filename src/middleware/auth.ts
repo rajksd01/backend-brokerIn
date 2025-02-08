@@ -23,3 +23,4 @@ export const authenticateToken = (
     return res.status(403).json({ message: 'Invalid token' });
   }
 }; 
+export const authenticate = authenticateToken;

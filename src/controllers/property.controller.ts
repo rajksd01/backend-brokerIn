@@ -6,8 +6,12 @@ export const createProperty = async (req: Request, res: Response) => {
     const property = new Property(req.body);
     await property.save();
     res.status(201).json(property);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: 'An unknown error occurred.' });
+    }
   }
 };
 
@@ -29,7 +33,11 @@ export const getProperties = async (req: Request, res: Response) => {
 
     const properties = await Property.find(query);
     res.json(properties);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'An unknown error occurred.' });
+    }
   }
 }; 

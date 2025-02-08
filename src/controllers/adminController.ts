@@ -67,12 +67,14 @@ export const deleteProperty = async (req: Request, res: Response) => {
     }
 
     // Delete property images
-    property.images.forEach(image => {
-      const imagePath = path.join(__dirname, '../../uploads/properties', image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    });
+    if (property.images && property.images.forEach) {
+      property.images.forEach(image => {
+        const imagePath = path.join(__dirname, '../../uploads/properties', image);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      });
+    }
 
     logger.info('Property deleted successfully', { propertyId: id });
     res.json({ message: 'Property deleted successfully' });

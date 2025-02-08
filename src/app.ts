@@ -2,9 +2,10 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
-import { specs } from './swagger/config.swagger';
+import { specs } from './config/swagger';  
 import { config } from './config/config';
 import authRoutes from './routes/authRoutes';
+import serviceRoutes from './routes/service.routes';  
 import logger from './utils/logger';
 import fs from 'fs';
 import path from 'path';
@@ -18,8 +19,16 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Enable CORS for all origins
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  credentials: true,
+  maxAge: 86400 // 24 hours
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // Swagger Documentation
@@ -37,6 +46,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/services', serviceRoutes);  
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -51,12 +61,13 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
     logger.info('Connected to MongoDB');
+    const PORT = config.PORT || 3030;
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`);
+    });
   })
-  .catch((err) => {
-    logger.error('MongoDB connection error:', err);
+  .catch((error) => {
+    logger.error('MongoDB connection error:', error);
   });
 
-// Start server
-app.listen(config.PORT, () => {
-  logger.info(`Server running on port ${config.PORT}`);
-}); 
+export default app;

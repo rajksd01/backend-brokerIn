@@ -1,8 +1,8 @@
 import { Document } from 'mongoose';
 
 export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin'
+  USER = 'USER',
+  ADMIN = 'ADMIN'
 }
 
 export interface IUser extends Document {
@@ -12,12 +12,8 @@ export interface IUser extends Document {
   phoneNumber: string;
   nationality: string;
   password: string;
-  profilePicture: string;
+  profilePicture?: string;
   role: UserRole;
-  isVerified: boolean;
-  verificationToken: string | null;
-  resetPasswordToken: string | null;
-  resetPasswordExpires: Date | null;
-  refreshToken: string | null;
+  refreshToken?: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
-} 
+}

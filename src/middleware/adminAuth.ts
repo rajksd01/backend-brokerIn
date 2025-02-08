@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../interfaces/Request';
-import User, { UserRole } from '../models/User';
+import  {UserRole}  from '../interfaces/User';
+import User from '../models/User';
 import logger from '../utils/logger';
 
 export const isAdmin = async (
