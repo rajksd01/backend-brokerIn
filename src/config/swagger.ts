@@ -15,7 +15,7 @@ const options = {
     },
     servers: [
       {
-        url: '/',  // This will make Swagger use the current domain
+        url: '/',
         description: 'Current Environment'
       }
     ],
@@ -46,6 +46,9 @@ const options = {
         }
       }
     },
+    security: [{
+      bearerAuth: []
+    }],
     tags: [
       { name: 'Auth', description: 'Authentication endpoints' },
       { name: 'Admin', description: 'Admin management endpoints' },
@@ -55,7 +58,9 @@ const options = {
   },
   apis: [
     path.join(__dirname, '../routes/*.ts'),
-    path.join(__dirname, '../routes/*.js')
+    path.join(__dirname, '../routes/*.js'),
+    path.join(__dirname, '../controllers/*.ts'),
+    path.join(__dirname, '../controllers/*.js')
   ]
 };
 

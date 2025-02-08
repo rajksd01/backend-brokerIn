@@ -6,6 +6,13 @@ const router: Router = express.Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: User authentication endpoints
+ */
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     UserResponse:
@@ -42,9 +49,9 @@ const router: Router = express.Router();
  * @swagger
  * /api/auth/signup:
  *   post:
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     summary: Register a new user
- *     description: Create a new user account with profile picture
+ *     description: Creates a new user account
  *     consumes:
  *       - multipart/form-data
  *     requestBody:
@@ -114,6 +121,8 @@ const router: Router = express.Router();
  *                 message:
  *                   type: string
  *                   example: User already exists
+ *       500:
+ *         description: Server error
  */
 router.post('/signup', upload.single('profilePicture'), authController.signup as express.RequestHandler);
 
@@ -121,7 +130,7 @@ router.post('/signup', upload.single('profilePicture'), authController.signup as
  * @swagger
  * /api/auth/signin:
  *   post:
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     summary: Login user
  *     description: Authenticate user using email/username and password
  *     requestBody:
@@ -161,6 +170,10 @@ router.post('/signup', upload.single('profilePicture'), authController.signup as
  *                   description: JWT refresh token
  *                 user:
  *                   $ref: '#/components/schemas/UserResponse'
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
  */
 router.post('/signin', authController.signin as express.RequestHandler);
 
@@ -168,7 +181,7 @@ router.post('/signin', authController.signin as express.RequestHandler);
  * @swagger
  * /api/auth/google-auth:
  *   post:
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     summary: Authenticate with Google
  *     description: Sign in or sign up using Google OAuth token
  *     requestBody:
@@ -195,6 +208,10 @@ router.post('/signin', authController.signin as express.RequestHandler);
  *                   type: string
  *                 user:
  *                   $ref: '#/components/schemas/UserResponse'
+ *       401:
+ *         description: Invalid token
+ *       500:
+ *         description: Server error
  */
 router.post('/google-auth', authController.googleAuth as express.RequestHandler);
 
@@ -202,7 +219,7 @@ router.post('/google-auth', authController.googleAuth as express.RequestHandler)
  * @swagger
  * /api/auth/refresh-token:
  *   post:
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     summary: Refresh JWT token
  *     description: Get new access token using refresh token
  *     security:
@@ -228,6 +245,10 @@ router.post('/google-auth', authController.googleAuth as express.RequestHandler)
  *               properties:
  *                 token:
  *                   type: string
+ *       401:
+ *         description: Invalid refresh token
+ *       500:
+ *         description: Server error
  */
 router.post('/refresh-token', authController.refreshToken as express.RequestHandler);
 
@@ -235,7 +256,7 @@ router.post('/refresh-token', authController.refreshToken as express.RequestHand
  * @swagger
  * /api/auth/profile-picture/{filename}:
  *   get:
- *     tags: [Auth]
+ *     tags: [Authentication]
  *     summary: Get user profile picture
  *     description: Retrieve user's profile picture by filename
  *     parameters:
