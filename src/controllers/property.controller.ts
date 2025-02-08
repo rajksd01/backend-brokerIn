@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Property, { IProperty } from '../models/Property';
+import Property from '../models/Property';
 
 export const createProperty = async (req: Request, res: Response) => {
   try {

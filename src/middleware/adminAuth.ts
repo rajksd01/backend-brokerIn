@@ -16,12 +16,16 @@ export const isAdmin = async (
 
     const user = await User.findById(req.userId);
     
-    if (!user || user.role !== UserRole.ADMIN) {
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.role !== UserRole.ADMIN) {
       logger.warn('Unauthorized admin access attempt', { userId: req.userId });
       return res.status(403).json({ message: 'Admin access required' });
     }
 
-    next();
+    return next();
   } catch (error) {
     logger.error('Error in admin authentication:', error);
     return res.status(500).json({ message: 'Internal server error' });

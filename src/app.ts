@@ -35,10 +35,10 @@ app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Logging middleware
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.url}`, {
-    ip: req.ip,
-    userAgent: req.get('user-agent')
+app.use((_req, _res, next) => {
+  logger.info(`${_req.method} ${_req.url}`, {
+    ip: _req.ip,
+    userAgent: _req.get('user-agent')
   });
   next();
 });
@@ -49,7 +49,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);  
 
 // Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   logger.error('Unhandled Error:', {
     error: err.message,
     stack: err.stack

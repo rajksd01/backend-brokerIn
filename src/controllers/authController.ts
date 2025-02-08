@@ -56,7 +56,7 @@ export const signup = async (req: FileRequest, res: Response) => {
 
     logger.info('User signup successful', { username });
     
-    res.status(201).json({
+    return res.status(201).json({
       message: 'User registered successfully',
       user: {
         _id: user._id,
@@ -74,7 +74,7 @@ export const signup = async (req: FileRequest, res: Response) => {
       fs.unlinkSync(req.file.path);
     }
     logger.error('Error in signup', { error, username: req.body.username });
-    res.status(500).json({ message: 'Error creating user' });
+    return res.status(500).json({ message: 'Error creating user' });
   }
 };
 
@@ -115,7 +115,7 @@ export const signin = async (req: Request, res: Response) => {
 
     logger.info('Signin successful', { identifier });
 
-    res.json({
+    return res.status(200).json({
       message: 'Login successful',
       user: {
         _id: user._id,
@@ -129,7 +129,7 @@ export const signin = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error in signin', { error, identifier: req.body.identifier });
-    res.status(500).json({ message: 'Error during login' });
+    return res.status(500).json({ message: 'Error during login' });
   }
 };
 
@@ -178,9 +178,10 @@ export const googleAuth = async (req: Request, res: Response) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.json({ accessToken, refreshToken });
+    return res.status(200).json({ accessToken, refreshToken });
   } catch (error) {
-    res.status(500).json({ message: 'Error with Google authentication', error });
+    logger.error('Error in Google authentication', { error });
+    return res.status(500).json({ message: 'Error during Google authentication' });
   }
 };
 
@@ -205,9 +206,10 @@ export const refreshToken = async (req: Request, res: Response) => {
       { expiresIn: '15m' }
     );
 
-    res.json({ accessToken });
+    return res.status(200).json({ token: accessToken });
   } catch (error) {
-    res.status(401).json({ message: 'Invalid refresh token' });
+    logger.error('Error in token refresh', { error });
+    return res.status(401).json({ message: 'Invalid refresh token' });
   }
 };
 

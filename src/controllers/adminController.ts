@@ -50,10 +50,10 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
     }
 
     logger.info('Property updated successfully', { propertyId: id });
-    res.json(property);
+    return res.status(200).json(property);
   } catch (error) {
-    logger.error('Error updating property:', error);
-    res.status(500).json({ message: 'Error updating property' });
+    logger.error('Update property error:', error);
+    return res.status(500).json({ message: 'Error updating property' });
   }
 };
 
@@ -77,10 +77,10 @@ export const deleteProperty = async (req: Request, res: Response) => {
     }
 
     logger.info('Property deleted successfully', { propertyId: id });
-    res.json({ message: 'Property deleted successfully' });
+    return res.status(200).json({ message: 'Property deleted successfully' });
   } catch (error) {
-    logger.error('Error deleting property:', error);
-    res.status(500).json({ message: 'Error deleting property' });
+    logger.error('Delete property error:', error);
+    return res.status(500).json({ message: 'Error deleting property' });
   }
 };
 
@@ -103,9 +103,9 @@ export const setDiscount = async (req: Request, res: Response) => {
     }
 
     logger.info('Property discount updated', { propertyId: id });
-    res.json(property);
+    return res.status(200).json({ message: 'Discount set successfully' });
   } catch (error) {
-    logger.error('Error setting discount:', error);
-    res.status(500).json({ message: 'Error setting discount' });
+    logger.error('Set discount error:', error);
+    return res.status(500).json({ message: 'Error setting discount' });
   }
 }; 
