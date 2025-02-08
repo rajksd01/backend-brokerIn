@@ -59,13 +59,16 @@ const options = {
   },
   apis: process.env.NODE_ENV === 'production'
     ? [
-        path.join(__dirname, './routes/*.js'),
-        path.join(__dirname, './controllers/*.js')
+        path.join(__dirname, '../routes/*.js'),    
+        path.join(__dirname, '../controllers/*.js') 
       ]
     : [
         path.join(__dirname, '../routes/*.ts'),
         path.join(__dirname, '../controllers/*.ts')
       ]
 };
+
+// Log the paths being searched
+console.log('Swagger searching in paths:', options.apis);
 
 export const specs = swaggerJsdoc(options);
