@@ -15,8 +15,8 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3030',
-        description: 'Development server'
+        url: '/',  // This will make Swagger use the current domain
+        description: 'Current Environment'
       }
     ],
     components: {

@@ -22,17 +22,43 @@ if (!fs.existsSync(uploadDir)) {
 // Enable CORS for all origins
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  methods: '*',
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
   credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
   maxAge: 86400 // 24 hours
 }));
 
 // Middleware
 app.use(express.json());
 
-// Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+// Home route
+app.get('/', (_req, res) => {
+  res.json({
+    message: 'Welcome to BrokerIn API',
+    status: 'API is running successfully',
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0',
+    endpoints: {
+      docs: '/api-docs',
+      auth: '/api/auth',
+      admin: '/api/admin',
+      services: '/api/services'
+    }
+  });
+});
+
+// Serve static files (if any)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Swagger Documentation with custom options
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "BrokerIn API Documentation"
+}));
 
 // Logging middleware
 app.use((_req, _res, next) => {
