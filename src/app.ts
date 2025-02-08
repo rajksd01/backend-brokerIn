@@ -37,12 +37,17 @@ app.use(express.json());
 // Serve static files (if any)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/services', serviceRoutes);
+
 // Swagger Documentation with custom options
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(specs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "BrokerIn API Documentation",
   swaggerOptions: {
     persistAuthorization: true,
     displayRequestDuration: true,
@@ -51,10 +56,7 @@ app.get('/api-docs', swaggerUi.setup(specs, {
   }
 }));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/services', serviceRoutes);
+
 
 // Home route
 app.get('/', (_req, res) => {
@@ -72,6 +74,22 @@ app.get('/', (_req, res) => {
   });
 });
 
+// Serve static files (if any)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Swagger Documentation with custom options
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(specs, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "BrokerIn API Documentation",
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true
+  }
+}));
+
 // Logging middleware
 app.use((_req, _res, next) => {
   logger.info(`${_req.method} ${_req.url}`, {
@@ -80,6 +98,11 @@ app.use((_req, _res, next) => {
   });
   next();
 });
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/services', serviceRoutes);  
 
 // Error handling middleware
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

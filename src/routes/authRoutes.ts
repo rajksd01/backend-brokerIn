@@ -15,6 +15,23 @@ const router: Router = express.Router();
  * @swagger
  * components:
  *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         fullName:
+ *           type: string
+ *         username:
+ *           type: string
+ *         email:
+ *           type: string
+ *         phoneNumber:
+ *           type: string
+ *         nationality:
+ *           type: string
+ *         password:
+ *           type: string
+ *         profilePicture:
+ *           type: string
  *     UserResponse:
  *       type: object
  *       properties:
@@ -43,6 +60,20 @@ const router: Router = express.Router();
  *         updatedAt:
  *           type: string
  *           format: date-time
+ *     Error:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *         errors:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               param:
+ *                 type: string
+ *               msg:
+ *                 type: string
  */
 
 /**
@@ -51,78 +82,25 @@ const router: Router = express.Router();
  *   post:
  *     tags: [Authentication]
  *     summary: Register a new user
- *     description: Creates a new user account
- *     consumes:
- *       - multipart/form-data
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             required:
- *               - fullName
- *               - username
- *               - email
- *               - phoneNumber
- *               - nationality
- *               - password
- *             properties:
- *               fullName:
- *                 type: string
- *                 description: User's full name
- *                 example: John Doe
- *               username:
- *                 type: string
- *                 description: Unique username
- *                 example: johndoe123
- *               email:
- *                 type: string
- *                 format: email
- *                 description: User's email address
- *                 example: john@example.com
- *               phoneNumber:
- *                 type: string
- *                 description: User's phone number
- *                 example: "+1234567890"
- *               nationality:
- *                 type: string
- *                 description: User's nationality
- *                 example: "US"
- *               password:
- *                 type: string
- *                 format: password
- *                 description: User's password (min 8 characters)
- *                 example: "StrongPass123!"
- *               profilePicture:
- *                 type: string
- *                 format: binary
- *                 description: User's profile picture
+ *             $ref: '#/components/schemas/User'
  *     responses:
  *       201:
- *         description: User created successfully
+ *         description: User created
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User registered successfully
- *                 user:
- *                   $ref: '#/components/schemas/UserResponse'
+ *               $ref: '#/components/schemas/UserResponse'
  *       400:
- *         description: Bad request
+ *         description: Validation error
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User already exists
- *       500:
- *         description: Server error
+ *               $ref: '#/components/schemas/Error'
  */
 router.post('/signup', upload.single('profilePicture'), authController.signup as express.RequestHandler);
 
@@ -132,7 +110,6 @@ router.post('/signup', upload.single('profilePicture'), authController.signup as
  *   post:
  *     tags: [Authentication]
  *     summary: Login user
- *     description: Authenticate user using email/username and password
  *     requestBody:
  *       required: true
  *       content:
@@ -183,7 +160,6 @@ router.post('/signin', authController.signin as express.RequestHandler);
  *   post:
  *     tags: [Authentication]
  *     summary: Authenticate with Google
- *     description: Sign in or sign up using Google OAuth token
  *     requestBody:
  *       required: true
  *       content:
@@ -221,7 +197,6 @@ router.post('/google-auth', authController.googleAuth as express.RequestHandler)
  *   post:
  *     tags: [Authentication]
  *     summary: Refresh JWT token
- *     description: Get new access token using refresh token
  *     security:
  *       - bearerAuth: []
  *     requestBody:

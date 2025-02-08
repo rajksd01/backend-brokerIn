@@ -71,4 +71,9 @@ const options = {
 // Log the paths being searched
 console.log('Swagger searching in paths:', options.apis);
 
+// Temporary debug logging
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+console.log('Resolved routes path:', path.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../routes/*.js' : '../routes/*.ts'));
+console.log('Resolved controllers path:', path.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../controllers/*.js' : '../controllers/*.ts'));
+
 export const specs = swaggerJsdoc(options);

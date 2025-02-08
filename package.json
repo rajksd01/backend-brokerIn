@@ -5,9 +5,8 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "build": "tsc",
-    "vercel-build":"npm run build",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/app.ts",
+    "build": "NODE_ENV=production tsc",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "jest",
@@ -15,7 +14,9 @@
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "postinstall": "npm run build",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "debug:swagger": "NODE_ENV=production node -e \"console.log(require('./dist/config/swagger').specs)\"",
+    "start:prod": "NODE_ENV=production node dist/app.js"
   },
   "keywords": [
     "flat-brokerage",
