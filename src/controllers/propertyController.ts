@@ -5,14 +5,53 @@ import logger from '../utils/logger';
 import path from 'path';
 import fs from 'fs';
 
+// Public endpoints
+export const getProperties = async (req: Request, res: Response) => {
+  try {
+    const query: any = {};
+    
+    // Apply filters
+    if (req.query.propertyType) query.propertyType = req.query.propertyType;
+    if (req.query.listingType) query.listingType = req.query.listingType;
+    if (req.query.city) query['location.city'] = req.query.city;
+    if (req.query.minPrice) query['price.amount'] = { $gte: Number(req.query.minPrice) };
+    if (req.query.maxPrice) {
+      query['price.amount'] = { 
+        ...query['price.amount'],
+        $lte: Number(req.query.maxPrice) 
+      };
+    }
+
+    const properties = await Property.find(query);
+    res.json(properties);
+  } catch (error) {
+    logger.error('Error fetching properties:', error);
+    res.status(500).json({ message: 'Error fetching properties' });
+  }
+};
+
+export const getPropertyById = async (req: Request, res: Response) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
+    res.json(property);
+  } catch (error) {
+    logger.error('Error fetching property:', error);
+    res.status(500).json({ message: 'Error fetching property' });
+  }
+};
+
+// Admin endpoints
 export const addProperty = async (req: AuthRequest, res: Response) => {
   try {
     const propertyData = req.body;
-    const images = (req.files as Express.Multer.File[])?.map(file => file.filename) || [];
+    const photos = (req.files as Express.Multer.File[])?.map(file => file.filename) || [];
 
     const property = new Property({
       ...propertyData,
-      images,
+      photos,
       createdBy: req.userId,
       updatedBy: req.userId
     });
@@ -30,10 +69,10 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    const images = (req.files as Express.Multer.File[])?.map(file => file.filename);
+    const photos = (req.files as Express.Multer.File[])?.map(file => file.filename);
 
-    if (images?.length) {
-      updateData.images = images;
+    if (photos?.length) {
+      updateData.photos = photos;
     }
 
     const property = await Property.findByIdAndUpdate(
@@ -57,7 +96,7 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const deleteProperty = async (req: Request, res: Response) => {
+export const deleteProperty = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const property = await Property.findByIdAndDelete(id);
@@ -68,8 +107,8 @@ export const deleteProperty = async (req: Request, res: Response) => {
 
     // Delete property images
     if (property.photos && property.photos.length) {
-      property.photos.forEach((photo: string) => {
-        const imagePath = path.join(__dirname, '../../uploads/properties', photo);
+      property.photos.forEach(image => {
+        const imagePath = path.join(__dirname, '../../uploads/properties', image);
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }
@@ -84,7 +123,7 @@ export const deleteProperty = async (req: Request, res: Response) => {
   }
 };
 
-export const setDiscount = async (req: Request, res: Response) => {
+export const setDiscount = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { discountedPrice } = req.body;

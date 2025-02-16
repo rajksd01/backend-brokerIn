@@ -106,10 +106,11 @@ router.post('/signup', upload.single('profilePicture'), authController.signup as
 
 /**
  * @swagger
- * /api/auth/signin:
+ * /auth/signin:
  *   post:
+ *     summary: Sign in to get authentication token
  *     tags: [Authentication]
- *     summary: Login user
+ *     security: []  # No security required for this endpoint
  *     requestBody:
  *       required: true
  *       content:
@@ -117,17 +118,17 @@ router.post('/signup', upload.single('profilePicture'), authController.signup as
  *           schema:
  *             type: object
  *             required:
- *               - identifier
+ *               - email
  *               - password
  *             properties:
- *               identifier:
+ *               email:
  *                 type: string
- *                 description: Email or username of the user
- *                 example: "john@example.com or johndoe123"
+ *                 format: email
+ *                 example: user@example.com
  *               password:
  *                 type: string
  *                 format: password
- *                 example: "StrongPass123!"
+ *                 example: "yourpassword123"
  *     responses:
  *       200:
  *         description: Login successful
@@ -136,21 +137,18 @@ router.post('/signup', upload.single('profilePicture'), authController.signup as
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                   example: Login successful
  *                 token:
  *                   type: string
- *                   description: JWT access token
- *                 refreshToken:
- *                   type: string
- *                   description: JWT refresh token
+ *                   description: JWT token to be used for authentication
  *                 user:
- *                   $ref: '#/components/schemas/UserResponse'
- *       401:
- *         description: Invalid credentials
- *       500:
- *         description: Server error
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     name:
+ *                       type: string
  */
 router.post('/signin', authController.signin as express.RequestHandler);
 

@@ -1,140 +1,143 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IProperty extends Document {
-  code?: string;                 // Society/Complex code
-  title: string;
-  propertyType: 'residential' | 'commercial' | 'pg';
-  listingType: 'sale' | 'rent';
-  location: {
-    address?: string;
-    locality?: string;
-    city?: string;
-    pinCode?: string;
-  };
+  property_id: string;
+  name: string;
+  description: string;
+  type: string;
+  size: number;
+  furnishing: 'Full' | 'Semi' | 'None';
+  availability: 'Immediate' | 'Within 15 Days' | 'Within 30 Days' | 'After 30 Days';
+  building_type: 'Apartment' | 'Villa' | 'Independent House' | 'Pent House' | 'Plot';
+  bhk: number;
+  bathrooms: number;
+  bedrooms: number;
+  listing_type: 'Rent' | 'Sell';
+  parking: 'Public' | 'Reserved';
+  property_type: 'Residential' | 'Commercial' | 'PG Hostel';
+  location: string;
   price: {
-    amount: number;
-    securityDeposit?: number;
-    isNegotiable?: boolean;
+    rent_monthly?: number;
+    sell_price?: number;
+    deposit?: number;
   };
-  area?: {
-    totalArea?: number;
-    unitOfMeasurement?: 'sqft' | 'sqm';
+  photos: string[];
+  amenities: string[];
+  status: 'Available' | 'Sold';
+  society: string;
+  added_by: Schema.Types.ObjectId;
+  zipcode: string;
+  pets_allowed: boolean;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
   };
-  details?: {
-    bedrooms?: number;
-    bathrooms?: number;
-    balconies?: number;
-    totalFloors?: number;
-    floorNumber?: number;
-    ageOfProperty?: number;
-    furnishingStatus?: 'unfurnished' | 'semifurnished' | 'furnished';
+  location_coordinates: {
+    latitude: number;
+    longitude: number;
   };
-  description?: string;
-  amenities?: string[];
-  images?: string[];
-  floorPlan?: string;
-  status: 'available' | 'underContract' | 'sold' | 'rented';
-  contact: {
-    name: string;
-    email?: string;
-    phone: string;
-    userType: 'owner' | 'agent';
-  };
-  // Additional fields for Commercial Properties
-  commercial?: {
-    buildingType?: 'office' | 'retail' | 'warehouse' | 'industrial';
-    floorPlanType?: 'open' | 'partitioned' | 'mixed';
-  };
-  // Additional fields for PG Properties
-  pg?: {
-    type?: 'men' | 'women' | 'coLiving';
-    roomType?: 'shared' | 'private';
-    availableBeds?: number;
-    foodIncluded?: boolean;
-    mealTypes?: string[];
-    rules?: string[];
-  };
-  createdAt: Date;
-  updatedAt: Date;
-  expiryDate?: Date;
-  isPremiumListing?: boolean;
-  requestedServices?: {
-    service: mongoose.Types.ObjectId;
-    status: 'pending' | 'approved' | 'completed';
-  }[];
 }
 
-const PropertySchema: Schema = new Schema({
-  code: { type: String },
-  title: { type: String, required: true },
-  propertyType: { type: String, required: true, enum: ['residential', 'commercial', 'pg'] },
-  listingType: { type: String, required: true, enum: ['sale', 'rent'] },
-  location: {
-    address: String,
-    locality: String,
-    city: String,
-    pinCode: String
+const PropertySchema = new Schema<IProperty>({
+  property_id: {
+    type: String,
+    unique: true,
+    // Will be auto-generated in pre-save middleware
   },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  type: { type: String, required: true },
+  size: { type: Number, required: true },
+  furnishing: { 
+    type: String, 
+    enum: ['Full', 'Semi', 'None'],
+    required: true 
+  },
+  availability: {
+    type: String,
+    enum: ['Immediate', 'Within 15 Days', 'Within 30 Days', 'After 30 Days'],
+    required: true
+  },
+  building_type: {
+    type: String,
+    enum: ['Apartment', 'Villa', 'Independent House', 'Pent House', 'Plot'],
+    required: true
+  },
+  bhk: { type: Number, required: true },
+  bathrooms: { type: Number, required: true },
+  bedrooms: { type: Number, required: true },
+  listing_type: { 
+    type: String, 
+    enum: ['Rent', 'Sell'],
+    required: true 
+  },
+  parking: { 
+    type: String, 
+    enum: ['Public', 'Reserved'],
+    required: true 
+  },
+  property_type: {
+    type: String,
+    enum: ['Residential', 'Commercial', 'PG Hostel'],
+    required: true
+  },
+  location: { type: String, required: true },
   price: {
-    amount: { type: Number, required: true },
-    securityDeposit: Number,
-    isNegotiable: { type: Boolean, default: false }
+    rent_monthly: { type: Number },
+    sell_price: { type: Number },
+    deposit: { type: Number }
   },
-  area: {
-    totalArea: Number,
-    unitOfMeasurement: { type: String, enum: ['sqft', 'sqm'] }
-  },
-  details: {
-    bedrooms: Number,
-    bathrooms: Number,
-    balconies: Number,
-    totalFloors: Number,
-    floorNumber: Number,
-    ageOfProperty: Number,
-    furnishingStatus: { type: String, enum: ['unfurnished', 'semifurnished', 'furnished'] }
-  },
-  description: String,
-  amenities: [String],
-  images: [String],
-  floorPlan: String,
+  photos: [{ type: String }],
+  amenities: [{ type: String }],
   status: { 
     type: String, 
-    required: true, 
-    enum: ['available', 'underContract', 'sold', 'rented'],
-    default: 'available'
+    enum: ['Available', 'Sold'],
+    default: 'Available' 
   },
-  contact: {
-    name: { type: String, required: true },
-    email: String,
-    phone: { type: String, required: true },
-    userType: { type: String, required: true, enum: ['owner', 'agent'] }
+  society: { type: String, required: true },
+  added_by: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'User',
+    required: true 
   },
-  commercial: {
-    buildingType: { type: String, enum: ['office', 'retail', 'warehouse', 'industrial'] },
-    floorPlanType: { type: String, enum: ['open', 'partitioned', 'mixed'] }
-  },
-  pg: {
-    type: { type: String, enum: ['men', 'women', 'coLiving'] },
-    roomType: { type: String, enum: ['shared', 'private'] },
-    availableBeds: Number,
-    foodIncluded: Boolean,
-    mealTypes: [String],
-    rules: [String]
-  },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-  expiryDate: Date,
-  isPremiumListing: { type: Boolean, default: false },
-  requestedServices: [{
-    service: { type: Schema.Types.ObjectId, ref: 'Service' },
-    status: { 
-      type: String, 
-      enum: ['pending', 'approved', 'completed'],
-      default: 'pending'
+  zipcode: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function(v: string) {
+        return /^\d{6}$/.test(v); // Validates 6-digit Indian postal code
+      },
+      message: 'Zipcode must be a valid 6-digit number'
     }
-  }]
+  },
+  pets_allowed: {
+    type: Boolean,
+    default: false
+  },
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    country: String
+  },
+  location_coordinates: {
+    latitude: Number,
+    longitude: Number
+  }
 }, {
   timestamps: true
+});
+
+// Add pre-save middleware to generate property_id
+PropertySchema.pre('save', async function(next) {
+  if (!this.property_id) {
+    // Generate a unique property ID (e.g., PROP-2024-001)
+    const count = await mongoose.model('Property').countDocuments();
+    this.property_id = `PROP-${new Date().getFullYear()}-${(count + 1).toString().padStart(3, '0')}`;
+  }
+  next();
 });
 
 export default mongoose.model<IProperty>('Property', PropertySchema); 

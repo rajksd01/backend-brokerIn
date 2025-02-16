@@ -16,4 +16,5 @@ export interface IUser extends Document {
   role: UserRole;
   refreshToken?: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
+  isAdmin: boolean;
 }

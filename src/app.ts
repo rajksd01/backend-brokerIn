@@ -10,6 +10,7 @@ import logger from './utils/logger';
 import fs from 'fs';
 import path from 'path';
 import adminRoutes from './routes/adminRoutes';
+import propertyRoutes from './routes/propertyRoutes';
 
 const app = express();
 
@@ -17,6 +18,12 @@ const app = express();
 const uploadDir = path.join(__dirname, '../uploads/profile-pictures');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Create uploads directory for properties if it doesn't exist
+const propertyUploadDir = path.join(__dirname, '../uploads/properties');
+if (!fs.existsSync(propertyUploadDir)) {
+  fs.mkdirSync(propertyUploadDir, { recursive: true });
 }
 
 // Enable CORS for all origins
@@ -34,20 +41,21 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
-// Serve static files (if any)
+// Serve static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/properties', propertyRoutes);
 
 // Swagger Documentation with custom options
 app.use('/api-docs', swaggerUi.serve);
 app.get('/api-docs', swaggerUi.setup(specs, {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "BrokerIn API Documentation",
   swaggerOptions: {
     persistAuthorization: true,
     displayRequestDuration: true,
@@ -55,8 +63,6 @@ app.get('/api-docs', swaggerUi.setup(specs, {
     tryItOutEnabled: true
   }
 }));
-
-
 
 // Home route
 app.get('/', (_req, res) => {
@@ -74,22 +80,6 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Serve static files (if any)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// Swagger Documentation with custom options
-app.use('/api-docs', swaggerUi.serve);
-app.get('/api-docs', swaggerUi.setup(specs, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "BrokerIn API Documentation",
-  swaggerOptions: {
-    persistAuthorization: true,
-    displayRequestDuration: true,
-    filter: true
-  }
-}));
-
 // Logging middleware
 app.use((_req, _res, next) => {
   logger.info(`${_req.method} ${_req.url}`, {
@@ -98,11 +88,7 @@ app.use((_req, _res, next) => {
   });
   next();
 });
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/services', serviceRoutes);  
+ 
 
 // Error handling middleware
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

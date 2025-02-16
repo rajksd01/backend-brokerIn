@@ -12,7 +12,8 @@ const UserSchema: Schema = new Schema({
   profilePicture: { type: String, default: 'default-profile.png' },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
   isVerified: { type: Boolean, default: true },
-  refreshToken: { type: String, default: null }
+  refreshToken: { type: String, default: null },
+  isAdmin: { type: Boolean, default: false }
 }, {
   timestamps: true
 });
