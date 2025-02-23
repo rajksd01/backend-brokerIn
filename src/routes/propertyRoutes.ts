@@ -185,6 +185,7 @@ router.put('/:id', authMiddleware, upload.array('photos'), updateProperty);
  */
 router.delete('/:id', authMiddleware, deleteProperty);
 
+
 router.post('/:id/discount', authMiddleware, setDiscount);
 
 export default router; 
