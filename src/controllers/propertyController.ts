@@ -203,8 +203,8 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
   session.startTransaction();
 
   try {
-    const { id } = req.params;
-    const property = await Property.findById(id);
+    const { property_id } = req.params;
+    const property = await Property.findOne({ property_id });
 
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
@@ -216,7 +216,7 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
     );
 
     // Delete the property
-    await Property.findByIdAndDelete(id);
+    await Property.deleteOne({ property_id });
 
     // Delete associated files only after successful DB operation
     photoPaths.forEach(photoPath => {
@@ -226,7 +226,7 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
     });
 
     await session.commitTransaction();
-    logger.info('Property deleted successfully', { propertyId: id });
+    logger.info('Property deleted successfully', { propertyId: property_id });
     return res.status(200).json({ message: 'Property deleted successfully' });
   } catch (error) {
     await session.abortTransaction();

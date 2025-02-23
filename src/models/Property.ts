@@ -1,12 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IProperty } from '../interfaces/Property';
 
-
 const PropertySchema = new Schema<IProperty>({
-  property_id: {
-    type: String,
-    unique: true,
-    // Will be auto-generated in pre-save middleware
+  property_id: { 
+    type: String, 
+    required: true, 
+    unique: true 
   },
   name: { type: String, required: true },
   description: { type: String, required: true },

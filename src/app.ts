@@ -14,7 +14,7 @@ import propertyRoutes from './routes/propertyRoutes';
 import propertyFormRoutes from './routes/propertyFormRoutes';
 
 const app = express();
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Create uploads directory if it doesn't exist
 const uploadDir = path.join(__dirname, '../uploads/profile-pictures');
 if (!fs.existsSync(uploadDir)) {
