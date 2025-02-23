@@ -1,29 +1,22 @@
 import multer from 'multer';
-import path from 'path';
 
-const storage = multer.diskStorage({
-  destination: function (_req, _file, cb) {
-    cb(null, path.join(__dirname, '../../uploads/properties'));
-  },
-  filename: function (_req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
-});
+// Configure multer for memory storage instead of disk
+const storage = multer.memoryStorage();
 
-const fileFilter = (req: any, file: any, cb: any) => {
+// File filter to accept only images
+const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    cb(new Error('Not an image! Please upload images only.'), false);
+    cb(new Error('Not an image! Please upload only images.'), false);
   }
 };
 
 const propertyUpload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage,
+  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
-    files: 9 // Max 9 files
   }
 });
 

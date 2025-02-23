@@ -6,6 +6,7 @@ import logger from '../utils/logger';
 import path from 'path';
 import fs from 'fs';
 import mongoose, { Schema } from 'mongoose'; // Ensure mongoose is imported
+import cloudinary from '../utils/cloudinary';
 
 // Public endpoints
 export const getProperties = async (req: Request, res: Response) => {
@@ -67,6 +68,30 @@ export const getPropertyById = async (req: Request, res: Response) => {
   }
 };
 
+// Helper function to upload to Cloudinary
+const uploadToCloudinary = async (file: Express.Multer.File, propertyName: string, index: number) => {
+  try {
+    // Convert buffer to base64
+    const b64 = Buffer.from(file.buffer).toString('base64');
+    const dataURI = `data:${file.mimetype};base64,${b64}`;
+    
+    // Generate filename based on property name
+    const sanitizedName = propertyName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const filename = `${sanitizedName}-${index + 1}`;
+    
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: 'properties',
+      public_id: filename,
+      resource_type: 'auto'
+    });
+    
+    return result.secure_url;
+  } catch (error) {
+    logger.error('Error uploading to Cloudinary:', error);
+    throw new Error('Failed to upload image');
+  }
+};
+
 // Admin endpoints
 export const addProperty = async (req: AuthRequest, res: Response) => {
   try {
@@ -78,7 +103,14 @@ export const addProperty = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: 'Selling price is required for sale properties' });
     }
 
-    const photos = (req.files as Express.Multer.File[])?.map(file => file.filename) || [];
+    // Upload photos to Cloudinary
+    const photoUrls = [];
+    if (req.files && Array.isArray(req.files)) {
+      const uploadPromises = (req.files as Express.Multer.File[]).map(
+        (file, index) => uploadToCloudinary(file, req.body.name, index)
+      );
+      photoUrls.push(...await Promise.all(uploadPromises));
+    }
 
     const property = new Property({
       name: req.body.name,
@@ -96,7 +128,7 @@ export const addProperty = async (req: AuthRequest, res: Response) => {
       property_type: req.body.property_type,
       location: req.body.location,
       price: req.body.price,
-      photos,
+      photos: photoUrls,
       amenities: req.body.amenities,
       status: req.body.status,
       society: req.body.society,
@@ -137,7 +169,6 @@ export const addProperty = async (req: AuthRequest, res: Response) => {
 export const updateProperty = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const photos = (req.files as Express.Multer.File[])?.map(file => file.filename);
 
     // Fetch existing property first
     const existingProperty = await Property.findById(id);
@@ -145,19 +176,19 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: 'Property not found' });
     }
 
-    // Validate price updates based on listing_type
-    if (req.body.listing_type) {
-      if (req.body.listing_type === 'Rent' && !req.body.price?.rent_monthly) {
-        return res.status(400).json({ message: 'Rent amount is required for rental properties' });
-      }
-      if (req.body.listing_type === 'Sell' && !req.body.price?.sell_price) {
-        return res.status(400).json({ message: 'Selling price is required for sale properties' });
-      }
+    // Upload new photos if provided
+    let photoUrls = existingProperty.photos;
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const uploadPromises = (req.files as Express.Multer.File[]).map(
+        (file, index) => uploadToCloudinary(file, existingProperty.name, index)
+      );
+      photoUrls = await Promise.all(uploadPromises);
     }
 
     const updateData: Partial<IProperty> = {
       updatedBy: req.userId,
-      ...req.body
+      ...req.body,
+      photos: photoUrls
     };
 
     // Handle nested address updates
@@ -166,18 +197,6 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
         ...existingProperty.address,
         ...req.body.address
       };
-    }
-
-    // Handle photo updates and cleanup old photos
-    if (photos?.length) {
-      updateData.photos = photos;
-      // Cleanup old photos
-      existingProperty.photos.forEach(photo => {
-        const photoPath = path.join(__dirname, '../../uploads/properties', photo);
-        if (fs.existsSync(photoPath)) {
-          fs.unlinkSync(photoPath);
-        }
-      });
     }
 
     const property = await Property.findByIdAndUpdate(
@@ -209,20 +228,14 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: 'Property not found' });
     }
 
-    // Store photo paths before deletion
-    const photoPaths = property.photos.map(photo => 
-      path.join(__dirname, '../../uploads/properties', photo)
-    );
+    // Delete images from Cloudinary
+    for (const photoUrl of property.photos) {
+      const publicId = photoUrl.split('/').slice(-1)[0].split('.')[0];
+      await cloudinary.uploader.destroy(`properties/${publicId}`);
+    }
 
     // Delete the property
     await Property.deleteOne({ property_id });
-
-    // Delete associated files only after successful DB operation
-    photoPaths.forEach(photoPath => {
-      if (fs.existsSync(photoPath)) {
-        fs.unlinkSync(photoPath);
-      }
-    });
 
     await session.commitTransaction();
     logger.info('Property deleted successfully', { propertyId: property_id });

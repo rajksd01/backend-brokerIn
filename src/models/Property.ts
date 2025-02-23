@@ -4,7 +4,7 @@ import { IProperty } from '../interfaces/Property';
 const PropertySchema = new Schema<IProperty>({
   property_id: { 
     type: String, 
-    required: true, 
+    required: false,
     unique: true 
   },
   name: { type: String, required: true },
@@ -91,14 +91,18 @@ const PropertySchema = new Schema<IProperty>({
   timestamps: true
 });
 
-// Add pre-save middleware to generate property_id
+// Modify the pre-save middleware to handle property_id generation
 PropertySchema.pre('save', async function(next) {
-  if (!this.property_id) {
-    // Generate a unique property ID (e.g., PROP-2024-001)
-    const count = await mongoose.model('Property').countDocuments();
-    this.property_id = `PROP-${new Date().getFullYear()}-${(count + 1).toString().padStart(3, '0')}`;
+  try {
+    if (!this.property_id) {
+      const currentYear = new Date().getFullYear();
+      const count = await mongoose.model('Property').countDocuments();
+      this.property_id = `PROP-${currentYear}-${(count + 1).toString().padStart(3, '0')}`;
+    }
+    next();
+  } catch (error) {
+    next(error as Error);
   }
-  next();
 });
 
 export default mongoose.model<IProperty>('Property', PropertySchema); 

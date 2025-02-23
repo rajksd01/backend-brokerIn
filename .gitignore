@@ -5,3 +5,6 @@ logs/
 uploads/
 swagger.json
 swagger.yaml
+text.txt
+.DS_Store
+src/.DS_Store

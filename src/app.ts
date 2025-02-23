@@ -7,25 +7,11 @@ import { config } from './config/config';
 import authRoutes from './routes/authRoutes';
 import serviceRoutes from './routes/service.routes';  
 import logger from './utils/logger';
-import fs from 'fs';
-import path from 'path';
 import adminRoutes from './routes/adminRoutes';
 import propertyRoutes from './routes/propertyRoutes';
 import propertyFormRoutes from './routes/propertyFormRoutes';
 
 const app = express();
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Create uploads directory if it doesn't exist
-const uploadDir = path.join(__dirname, '../uploads/profile-pictures');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Create uploads directory for properties if it doesn't exist
-const propertyUploadDir = path.join(__dirname, '../uploads/properties');
-if (!fs.existsSync(propertyUploadDir)) {
-  fs.mkdirSync(propertyUploadDir, { recursive: true });
-}
 
 // Enable CORS for all origins
 app.use(cors({
@@ -41,9 +27,6 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
-
-// Serve static files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
