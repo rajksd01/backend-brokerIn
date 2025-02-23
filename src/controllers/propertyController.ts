@@ -81,7 +81,6 @@ export const addProperty = async (req: AuthRequest, res: Response) => {
     const photos = (req.files as Express.Multer.File[])?.map(file => file.filename) || [];
 
     const property = new Property({
-      property_id: req.body.property_id,
       name: req.body.name,
       description: req.body.description,
       type: req.body.type,
