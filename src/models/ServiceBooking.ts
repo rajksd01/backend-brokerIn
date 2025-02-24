@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IServiceBooking extends Document {
   service_booking_id: string;
-  service_type: 'furniture' | 'interior' | 'painting' | 'cleaning' | 'plumbing' | 'electrical' | 'moving' | 'ac';
+  service_type: string;
   name: string;
   phone_number: string;
   preferred_date: Date;
@@ -24,7 +24,7 @@ const ServiceBookingSchema: Schema = new Schema({
   service_type: {
     type: String,
     required: true,
-    enum: ['furniture', 'interior', 'painting', 'cleaning', 'plumbing', 'electrical', 'moving', 'ac']
+  
   },
   name: {
     type: String,
