@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IProperty } from '../interfaces/Property';
+import crypto from 'crypto';
 
 const PropertySchema = new Schema<IProperty>({
   property_id: { 
@@ -91,18 +92,19 @@ const PropertySchema = new Schema<IProperty>({
   timestamps: true
 });
 
-// Modify the pre-save middleware to handle property_id generation
-PropertySchema.pre('save', async function(next) {
-  try {
-    if (!this.property_id) {
-      const currentYear = new Date().getFullYear();
-      const count = await mongoose.model('Property').countDocuments();
-      this.property_id = `PROP-${currentYear}-${(count + 1).toString().padStart(3, '0')}`;
-    }
-    next();
-  } catch (error) {
-    next(error as Error);
+// Pre-save middleware to generate property_id
+PropertySchema.pre('save', function(next) {
+  if (this.isNew) {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const randomString = crypto.randomBytes(3).toString('hex').toUpperCase();
+    
+    // Format: PROP-2024-0319-A1B2C3
+    this.property_id = `PROP-${year}-${month}${day}-${randomString}`;
   }
+  next();
 });
 
 export default mongoose.model<IProperty>('Property', PropertySchema); 
