@@ -11,6 +11,7 @@ import adminRoutes from './routes/adminRoutes';
 import propertyRoutes from './routes/propertyRoutes';
 import propertyFormRoutes from './routes/propertyFormRoutes';
 import serviceBookingRoutes from './routes/serviceBookingRoutes';
+import contactRoutes from './routes/contactRoutes';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/service-bookings', serviceBookingRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/property-forms', propertyFormRoutes);
+app.use('/api/contacts', contactRoutes);
 
 // Swagger Documentation with custom options
 app.use('/api-docs', swaggerUi.serve);
