@@ -12,14 +12,15 @@ export const sendServiceBookingEmail = async (booking: IServiceBooking) => {
     subject: 'New Service Booking',
     html: `
       <h2>New Service Booking Request</h2>
-      <p><strong>Customer:</strong> ${booking.contactDetails.name}</p>
-      <p><strong>Phone:</strong> ${booking.contactDetails.phone}</p>
-      <p><strong>Email:</strong> ${booking.contactDetails.email}</p>
-      <p><strong>Address:</strong> ${booking.contactDetails.address}</p>
-      <p><strong>Scheduled Date:</strong> ${booking.scheduledDate}</p>
-      <p><strong>Time Slot:</strong> ${booking.scheduledTimeSlot}</p>
-      <p><strong>Requires Estimate:</strong> ${booking.requiresEstimate ? 'Yes' : 'No'}</p>
-      <p><strong>Notes:</strong> ${booking.notes || 'N/A'}</p>
+      <p><strong>Booking ID:</strong> ${booking.service_booking_id}</p>
+      <p><strong>Service Type:</strong> ${booking.service_type}</p>
+      <p><strong>Customer:</strong> ${booking.name}</p>
+      <p><strong>Phone:</strong> ${booking.phone_number}</p>
+      <p><strong>Preferred Date:</strong> ${booking.preferred_date}</p>
+      <p><strong>Preferred Time:</strong> ${booking.preferred_time}</p>
+      <p><strong>Service Address:</strong> ${booking.service_address}</p>
+      <p><strong>Additional Notes:</strong> ${booking.additional_notes || 'N/A'}</p>
+      <p><strong>Status:</strong> ${booking.status}</p>
     `
   };
 

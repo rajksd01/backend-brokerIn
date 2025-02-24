@@ -5,11 +5,12 @@ import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger';  
 import { config } from './config/config';
 import authRoutes from './routes/authRoutes';
-import serviceRoutes from './routes/service.routes';  
+import serviceRoutes from './routes/serviceRoutes';
 import logger from './utils/logger';
 import adminRoutes from './routes/adminRoutes';
 import propertyRoutes from './routes/propertyRoutes';
 import propertyFormRoutes from './routes/propertyFormRoutes';
+import serviceBookingRoutes from './routes/serviceBookingRoutes';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/service-bookings', serviceBookingRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/property-forms', propertyFormRoutes);
 
