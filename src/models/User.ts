@@ -1,6 +1,22 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser, UserRole } from '../interfaces/User';
+import { UserRole } from '../interfaces/User';
+
+export interface IUser extends Document {
+  fullName: string;
+  username: string;
+  email: string;
+  phoneNumber: string;
+  nationality: string;
+  password: string;
+  otp?: string;
+  otpExpires?: Date;
+  isVerified: boolean;
+  profilePicture: string;
+  role: UserRole;
+  refreshToken: string | null;
+  isAdmin: boolean;
+}
 
 const UserSchema: Schema = new Schema({
   fullName: { type: String, required: true },
@@ -11,9 +27,11 @@ const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   profilePicture: { type: String, default: 'default-profile.png' },
   role: { type: String, enum: Object.values(UserRole), default: UserRole.USER },
-  isVerified: { type: Boolean, default: true },
+  isVerified: { type: Boolean, default: false },
   refreshToken: { type: String, default: null },
-  isAdmin: { type: Boolean, default: false }
+  isAdmin: { type: Boolean, default: false },
+  otp: { type: String },
+  otpExpires: { type: Date }
 }, {
   timestamps: true
 });

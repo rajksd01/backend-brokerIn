@@ -12,6 +12,8 @@ import propertyRoutes from './routes/propertyRoutes';
 import propertyFormRoutes from './routes/propertyFormRoutes';
 import serviceBookingRoutes from './routes/serviceBookingRoutes';
 import contactRoutes from './routes/contactRoutes';
+import cron from 'node-cron';
+import User from './models/User'; // Adjust the import based on your file structure
 
 const app = express();
 
@@ -95,6 +97,17 @@ mongoose.connect(config.MONGODB_URI)
     const PORT = config.PORT || 3030;
     app.listen(PORT, () => {
       logger.info(`Server is running on port ${PORT}`);
+    });
+
+    // Schedule a job to run every 20 minutes
+    cron.schedule('*/20 * * * *', async () => {
+      try {
+        const now = new Date();
+        await User.deleteMany({ isVerified: false, otpExpires: { $lt: now } });
+        console.log('Deleted unverified users who did not verify within 20 minutes.');
+      } catch (error) {
+        console.error('Error deleting unverified users', error);
+      }
     });
   })
   .catch((error) => {

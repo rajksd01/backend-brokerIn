@@ -15,6 +15,9 @@ export interface IUser extends Document {
   profilePicture?: string;
   role: UserRole;
   refreshToken?: string;
+  isVerified: boolean;
   comparePassword(candidatePassword: string): Promise<boolean>;
   isAdmin: boolean;
+  otp?: string; // Field to store OTP
+  otpExpires?: Date;
 }

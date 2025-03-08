@@ -252,4 +252,7 @@ router.post('/refresh-token', authController.refreshToken as express.RequestHand
  */
 router.get('/profile-picture/:filename', authController.getProfilePicture as express.RequestHandler);
 
+// OTP verification route
+router.post('/verify-otp', authController.verifyOtp);
+
 export default router;
