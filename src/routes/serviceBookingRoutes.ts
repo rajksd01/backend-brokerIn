@@ -1,6 +1,7 @@
 import express from 'express';
 import { serviceBookingController } from '../controllers/serviceBookingController';
 import { authenticateToken } from '../middleware/auth';
+import { isAdmin } from '../middleware/adminAuth';
 
 const router = express.Router();
 
@@ -77,10 +78,10 @@ router.post('/', serviceBookingController.createBooking);
  *       200:
  *         description: List of bookings
  */
-router.get('/', authenticateToken, serviceBookingController.getBookings);
+router.get('/', authenticateToken,isAdmin, serviceBookingController.getBookings);
 
 router.get('/:id', authenticateToken, serviceBookingController.getBookingById);
-router.patch('/:id/status', authenticateToken, serviceBookingController.updateBookingStatus);
-router.post('/:id/cancel', authenticateToken,serviceBookingController.cancelBooking);
+router.put('/:id/status', authenticateToken, serviceBookingController.updateBookingStatus);
+router.put('/:id/cancel', authenticateToken,serviceBookingController.cancelBooking);
 
 export default router; 

@@ -9,7 +9,7 @@ export interface IServiceBooking extends Document {
   preferred_time: string;
   service_address: string;
   additional_notes?: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: 'requested'| 'accepted' | 'ongoing' | 'completed' | 'cancelled';
   created_at: Date;
   updated_at: Date;
 }
@@ -67,8 +67,8 @@ const ServiceBookingSchema: Schema = new Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
-    default: 'pending'
+    enum: ['requested', 'accepted', 'ongoing','completed', 'cancelled'],
+    default: 'requested'
   }
 }, {
   timestamps: { 

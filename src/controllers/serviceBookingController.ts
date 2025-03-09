@@ -59,8 +59,7 @@ export const serviceBookingController = {
   // Get booking by ID
   async getBookingById(req: Request, res: Response) {
     try {
-      const booking = await ServiceBooking.findOne({
-        service_booking_id: req.params.id
+      const booking = await ServiceBooking.findOne({_id:req.params.id
       });
 
       if (!booking) {
@@ -109,7 +108,7 @@ export const serviceBookingController = {
     try {
       const booking = await ServiceBooking.findOneAndUpdate(
         { 
-          service_booking_id: req.params.id,
+          _id: req.params.id,
           status: { $nin: ['completed', 'cancelled'] }
         },
         { status: 'cancelled' },

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import Property from '../models/Property';
 import { AuthRequest } from '../interfaces/Request';
 import {IProperty} from '../interfaces/Property';
@@ -274,3 +274,20 @@ export const setDiscount = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: 'Error setting discount' });
   }
 }; 
+
+
+export const checkPropertyExists = async (req: Request, res: Response, next: NextFunction) => {
+  const { property_id } = req.body; // Assuming property_id is sent in the request body
+
+  try {
+    const property = await Property.findOne({"property_id": property_id });
+    
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }// Optional: attach the property to the request object
+    next(); // Proceed to the next middleware or route handler
+  } catch (error) {
+    console.error('Error checking property existence:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};

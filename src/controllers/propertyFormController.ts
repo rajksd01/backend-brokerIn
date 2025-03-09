@@ -1,13 +1,12 @@
-import { Request, Response } from 'express';
+import { Request, Response ,NextFunction} from 'express';
 import PropertyForm from '../models/PropertyForm';
 import { AuthRequest } from '../interfaces/Request'; // Assuming you have an AuthRequest interface
-import mongoose from 'mongoose'; // Import mongoose to use ObjectId
+import Property from '../models/Property';
 
 // Create a new property form entry
 export const createPropertyForm = async (req: AuthRequest, res: Response) => {
   try {
     const propertyFormData = {
-      id: new mongoose.Types.ObjectId().toString(), // Generate a unique ID for the form
       property_id: req.body.property_id, // Reference to the property ID
       name: req.body.name,
       email: req.body.email,
@@ -16,10 +15,17 @@ export const createPropertyForm = async (req: AuthRequest, res: Response) => {
       userId: req.userId ? req.userId : undefined // Include userId if logged in
     };
 
+    // Validate required fields
+    if (!propertyFormData.property_id || !propertyFormData.name || !propertyFormData.email) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    // Create a new property form without checking for existing forms
     const propertyForm = new PropertyForm(propertyFormData);
-    await propertyForm.save();
+    await propertyForm.save(); // Save the new property form
     res.status(201).json({ message: "Property form created", property_details: propertyForm });
   } catch (error) {
+    console.error('Error creating property form:', error);
     res.status(500).json({ message: 'Error creating property form', error });
   }
 };
