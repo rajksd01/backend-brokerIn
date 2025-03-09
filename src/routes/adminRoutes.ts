@@ -3,11 +3,10 @@ import * as adminController from '../controllers/adminController';
 import { authenticateToken } from '../middleware/auth';
 import { isAdmin } from '../middleware/adminAuth';
 import { upload } from '../utils/fileUpload';
-import User from '../models/User'; // Assuming you have a User model
+import User from '../models/User'; 
 
 const router = express.Router();
 
-// All routes require authentication and admin privileges
 router.use(authenticateToken, isAdmin);
 
 router.post('/properties', upload.array('images', 10), adminController.addProperty);
@@ -16,12 +15,7 @@ router.delete('/properties/:id', adminController.deleteProperty);
 router.post('/properties/:id/discount', adminController.setDiscount);
 
 // Route to check if the user is an admin
-router.get('/check-admin', authenticateToken, (req, res) => {
-  if (req.user && req.user.role === 'admin') {
-    return res.status(200).json({ isAdmin: true });
-  }
-  return res.status(403).json({ isAdmin: false });
-});
+
 
 // Route to update user role
 router.patch('/update-role/:id', authenticateToken, async (req, res) => {

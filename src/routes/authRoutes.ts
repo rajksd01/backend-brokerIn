@@ -1,6 +1,8 @@
 import express, { Router } from 'express';
 import * as authController from '../controllers/authController';
 import { upload } from '../utils/fileUpload';
+import { authenticateToken } from '../middleware/auth';
+import { isAdmin } from '../middleware/adminAuth';
 
 const router: Router = express.Router();
 
@@ -254,5 +256,9 @@ router.get('/profile-picture/:filename', authController.getProfilePicture as exp
 
 // OTP verification route
 router.post('/verify-otp', authController.verifyOtp);
+
+router.get('/check-admin', authenticateToken, isAdmin, (req, res) => {
+  return res.status(200).json({ isAdmin: true });
+});
 
 export default router;

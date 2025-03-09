@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { authenticate as authMiddleware } from '../middleware/auth';
+import { authenticateToken, authenticate as authMiddleware } from '../middleware/auth';
 import { getProperties, getPropertyById, addProperty, updateProperty, deleteProperty, setDiscount } from '../controllers/propertyController';
 import multer from 'multer';
 import path from 'path';
 import propertyUpload from '../middleware/propertyUpload';
+import { isAdmin } from '../middleware/adminAuth';
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -143,7 +144,7 @@ router.get('/:id', getPropertyById);
  *       500:
  *         description: Server error
  */
-router.post('/', authMiddleware, propertyUpload.array('images', 5), addProperty);
+router.post('/', authenticateToken,isAdmin, propertyUpload.array('images', 5), addProperty);
 
 /**
  * @swagger
@@ -163,7 +164,7 @@ router.post('/', authMiddleware, propertyUpload.array('images', 5), addProperty)
  *       200:
  *         description: Property updated
  */
-router.put('/:id', authMiddleware, upload.array('photos'), updateProperty);
+router.put('/:id', authenticateToken,isAdmin, upload.array('photos'), updateProperty);
 
 /**
  * @swagger
@@ -183,9 +184,9 @@ router.put('/:id', authMiddleware, upload.array('photos'), updateProperty);
  *       200:
  *         description: Property deleted
  */
-router.delete('/:id', authMiddleware, deleteProperty);
+router.delete('/:id', authenticateToken,isAdmin, deleteProperty);
 
 
-router.post('/:id/discount', authMiddleware, setDiscount);
+router.post('/:id/discount', authenticateToken,isAdmin, setDiscount);
 
 export default router; 
