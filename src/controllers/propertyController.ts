@@ -221,9 +221,8 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
   session.startTransaction();
 
   try {
-    const { property_id } = req.params;
-    const property = await Property.findOne({ property_id });
-
+    const { id } = req.params;
+    const property = await Property.findById({ _id:id });
     if (!property) {
       return res.status(404).json({ message: 'Property not found' });
     }
@@ -235,10 +234,10 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
     }
 
     // Delete the property
-    await Property.deleteOne({ property_id });
+    await Property.deleteOne({ _id:id });
 
     await session.commitTransaction();
-    logger.info('Property deleted successfully', { propertyId: property_id });
+    logger.info('Property deleted successfully', { propertyId: property.property_id });
     return res.status(200).json({ message: 'Property deleted successfully' });
   } catch (error) {
     await session.abortTransaction();
